@@ -1,0 +1,113 @@
+/* Container */
+.auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #000;
+  min-height: 100vh;
+  
+}
+
+/* Card */
+.auth-card {
+  background-color: #1e1e1e;
+  padding: 32px;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 360px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Title */
+.auth-title {
+  color: #fff;
+  text-align: center;
+  margin-bottom: 24px;
+  font-size: 24px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight:normal
+}
+
+/* Form */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Input */
+.auth-input {
+  padding: 10px 12px;
+  background-color: #2b2b2b;
+  border: none;
+  color: #fff;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.auth-input:focus {
+  outline: 2px solid #3b82f6;
+}
+
+/* Password wrapper */
+.password-wrapper {
+  position: relative;
+}
+
+.forgot-link{
+  padding-right: 180px;
+}
+
+.forgot-password-link {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  font-size: 12px;
+  color: #3b82f6;
+  text-decoration: none;
+  font-family: Arial, Helvetica, sans-serif;
+  padding-left: 4px;
+}
+
+.forgot-password-link:hover {
+  text-decoration: underline;
+}
+
+/* Button */
+.auth-button {
+  background-color: #3b82f6;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: normal;
+}
+
+.auth-button:hover {
+  background-color: #2563eb;
+}
+
+/* Footer links */
+.auth-footer-text {
+  color: #aaa;
+  text-align: center;
+  margin-top: 16px;
+  font-size: 14px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.auth-footer-text a {
+  color: #3b82f6;
+  text-decoration: none;
+}
+
+.auth-footer-text a:hover {
+  text-decoration: underline;
+}
+
