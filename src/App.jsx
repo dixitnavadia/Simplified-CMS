@@ -1,6 +1,6 @@
 import Register from './pages/register'
 import Login from './pages/login'
-import './App.css'
+import NewPage from './pages/NewPage'
 
 function App() {
   
@@ -8,7 +8,8 @@ function App() {
   return (
     <>
       {/* <Register /> */}
-      <Login />
+      {/* <Login /> */}
+      <NewPage />
 
     </>
   )
