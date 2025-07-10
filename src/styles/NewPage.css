@@ -32,6 +32,7 @@ body {
 }
 
 .top-bar {
+  margin-left: 20px;
   display: flex;
   width: 70vw;
   padding: 32px 32px 0px 32px;
@@ -52,7 +53,7 @@ body {
 .actions {
   display: flex;
   gap: 16px;
-  position: fixed;
+  position:absolute;
   left: 75vw;
 }
 
@@ -97,6 +98,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  color: whitesmoke;
 }
 
 .field,
@@ -105,6 +107,7 @@ body {
   padding: 12px 16px;
   border-radius: 6px;
   margin-bottom: 8px;
+  color: whitesmoke;
 }
 
 .drop-zone {
@@ -156,13 +159,25 @@ body {
 }
 
 .new-page-btn {
+   width: 160px !important;
+  min-width: 160px;
+  max-width: 160px;
+  height: 40px;
+  box-sizing: border-box;
   margin-top: 20px;
-  padding: 10px;
-  width: 100%;
+  padding: 10px 0;
   background-color: #217aff;
   color: white;
   border: none;
   cursor: pointer;
+  font-size: 1rem;
+  border-radius: 4px;
+  text-align: center;
+  transition: background 0.2s;
+}
+
+.new-page-btn:hover {
+  background-color: #1761c7;
 }
 
 .preview,
@@ -198,5 +213,109 @@ h1 {
 
 h2 {
     font-size: 1.7rem ;
-    
+}
+
+.image {
+  width:100px;
+  height:100px;
+  background: url(http://goo.gl/vyAs27) no-repeat scroll 0 0;
+}
+
+/* --- Responsive Design --- */
+
+/* Tablet: Stack sidebar on top, adjust paddings and widths */
+@media (max-width: 1024px) {
+  .app {
+    flex-direction: column;
+    height: auto;
+  }
+  .sidebar {
+    width: 100vw;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 8px;
+  }
+  .sidebar nav ul {
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+  }
+  .main-layout,
+  .top-bar,
+  .main-content,
+  .right-panel {
+    width: 100vw;
+    min-width: 0;
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+  .main-layout {
+    padding: 12px 8px;
+  }
+  .top-bar {
+    margin-left: 0;
+    padding: 16px 8px 0 8px;
+  }
+  .main-content {
+    margin-left: 0;
+    padding: 0 8px 16px 8px;
+  }
+  .right-panel {
+    width: 100vw;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: flex-start;
+    padding-top: 8px;
+    margin-bottom: 16px;
+  }
+  .properties {
+    margin-right: 0;
+    margin-left: 16px;
+    height: auto;
+    padding: 16px 8px;
+  }
+}
+
+/* Mobile: Stack everything, shrink paddings, font sizes, and images */
+@media (max-width: 700px) {
+  .main-content {
+    flex-direction: column-reverse;
+    margin-left: 0;
+    padding: 0 4px 8px 4px;
+  }
+
+ .right-panel {
+    display: none !important;
+  }
+  .properties {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    margin: 0 0 8px 0;
+    padding: 8px 4px;
+    font-size: 0.95rem;
+    height: auto;
+    border-radius: 6px;
+    gap: 12px;
+    background: #181818;
+  }
+  .properties h3 {
+    margin: 0 12px 0 0;
+    font-size: 1rem;
+    white-space: nowrap;
+  }
+  .prop-field {
+    margin-bottom: 0;
+    margin-right: 8px;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 0.95rem;
+  }
+}
+  .user-icon {
+    display: none;
+  }
 }

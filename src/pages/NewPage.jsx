@@ -29,19 +29,31 @@ const NewPage = () => {
         </div>
 
         <main className="main-content">
-          <div className="editor">
-            <div className="field">Product Title: Smartphone X</div>
-            <div className="field">
-              Description: Latest model with improved battery life
-            </div>
-            <div className="field">Image: smartphone.jpg</div>
-            <div className="field">Video: demo.mp4</div>
+          <form className="editor">
+            <input
+              type="text"
+              className="field"
+              placeholder="Product Title: Smartphone X"
+            />
+            <input
+              type="text"
+              className="field"
+              placeholder="Description: Latest model with improved battery life"
+            />
+            <input type="price" className="field" placeholder="Price" />
+            <input
+              type="image"
+              className="image"
+              placeholder="Upload Image"
+              src="https://placehold.jp/150x150.png"
+              alt="Product Image"
+            />
             <div className="drop-zone">Drag & Drop to Add Content</div>
-          </div>
+          </form>
         </main>
       </div>
 
-     <div className="right-panel">
+      <div className="right-panel">
         <div className="user-icon">U</div>
         <aside className="properties">
           <h3>Quick Properties</h3>
