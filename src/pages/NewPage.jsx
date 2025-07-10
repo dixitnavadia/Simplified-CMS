@@ -21,26 +21,12 @@ const NewPage = () => {
         <div className="top-bar">
           <header className="header">
             <h2>New Product Page</h2>
-            <div className="actions">
-              <button className="preview">Preview</button>
-              <button className="publish">Publish</button>
-            </div>
           </header>
         </div>
 
         <main className="main-content">
           <form className="editor">
-            <input
-              type="text"
-              className="field"
-              placeholder="Product Title: Smartphone X"
-            />
-            <input
-              type="text"
-              className="field"
-              placeholder="Description: Latest model with improved battery life"
-            />
-            <input type="price" className="field" placeholder="Price" />
+            <input type="text" className="field" placeholder="Beispiel Text" />
             <input
               type="image"
               className="image"
@@ -48,9 +34,14 @@ const NewPage = () => {
               src="https://placehold.jp/150x150.png"
               alt="Product Image"
             />
-            <div className="drop-zone">Drag & Drop to Add Content</div>
           </form>
+          
+          <div className="actions">
+            <button className="save">Save</button>
+            <button className="new-element">Add New Element</button>
+          </div>
         </main>
+        
       </div>
 
       <div className="right-panel">

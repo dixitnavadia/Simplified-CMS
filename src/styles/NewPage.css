@@ -51,10 +51,10 @@ body {
 }
 
 .actions {
+  margin: 50px;
   display: flex;
+  flex-direction: row-reverse;
   gap: 16px;
-  position:absolute;
-  left: 75vw;
 }
 
 .right-panel {
@@ -63,7 +63,6 @@ body {
   align-items: center;
   width: 10vw;
   padding-top: 32px;
-  
 }
 
 .user-icon {
@@ -89,7 +88,9 @@ body {
   flex: 1;
   padding: 0 32px 32px 32px;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
+  justify-content:flex-start ;
+ flex-direction: column;
   margin-left: 20px;
 }
 
@@ -180,24 +181,17 @@ body {
   background-color: #1761c7;
 }
 
-.preview,
-.publish {
+
+.save, .new-element{
   padding: 8px 12px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-}
-
-.preview {
-  background-color: #1e1e1e;
-  color: white;
-  position: relative;
-}
-
-.publish {
   background-color: #217aff;
   color: white;
 }
+
+
 
 .nav-bar-item {
   color: #ccc;
@@ -318,4 +312,3 @@ h2 {
   .user-icon {
     display: none;
   }
-}
