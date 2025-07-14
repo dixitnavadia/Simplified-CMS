@@ -3,9 +3,9 @@ import "../styles/NewPage.css";
 
 const PropertiesBar = ({ element }) => {
   if (!element) return null;
-
+    
   return (
-    <div className="right-panel">
+    <div className="right-panel" onClick={e => e.stopPropagation()}>
       <aside className="properties">
         <h3>Quick Properties</h3>
         {element.type === "header" && (

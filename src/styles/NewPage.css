@@ -55,6 +55,7 @@ body {
   display: flex;
   flex-direction: row-reverse;
   gap: 16px;
+  justify-content: center;
 }
 
 .right-panel {

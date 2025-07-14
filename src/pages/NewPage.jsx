@@ -16,7 +16,7 @@ const NewPage = () => {
 
   const elementStyle = {
     border: "1px dashed grey",
-    bgcolor: "darkgray",
+    bgcolor: "slategray",
     color: "white",
     padding: "10px",
     alignContent: "center",
@@ -28,7 +28,7 @@ const NewPage = () => {
   };
 
   return (
-    <div className="app">
+    <div className="app" onClick={() => setSelectedElement(null)}> 
       <LeftNavBar />
       <div className="main-layout">
         <div className="top-bar">
@@ -38,27 +38,47 @@ const NewPage = () => {
           <div className="user-icon">U</div>
         </div>
 
-        <div className="Elements">
-          
+        <div
+          className="Elements"
+        >
           {elements.map((el, id) => {
-            const handleElementClick = () => setSelectedElement({ ...el, id });
+            const handleElementClick = (event) => {
+              event.stopPropagation(); 
+              setSelectedElement({ ...el, id });
+            };
             if (el.type === "header") {
               return (
-                <Box key={id} component="header" sx={elementStyle} onClick={handleElementClick}>
+                <Box
+                  key={id}
+                  component="header"
+                  sx={elementStyle}
+                  onClick={handleElementClick}
+                >
                   Header
                 </Box>
               );
             }
             if (el.type === "paragraph") {
               return (
-                <Box key={id} component="p" sx={elementStyle} onClick={handleElementClick}>
+                <Box
+                  key={id}
+                  component="p"
+                  sx={elementStyle}
+                  onClick={handleElementClick}
+                >
                   Paragraph
                 </Box>
               );
             }
             if (el.type === "image") {
               return (
-                <Box key={id} component="img" sx={elementStyle} alt="Image" onClick={handleElementClick}/>
+                <Box
+                  key={id}
+                  component="img"
+                  sx={elementStyle}
+                  alt="Image"
+                  onClick={handleElementClick}
+                />
               );
             }
             return null;
@@ -67,7 +87,7 @@ const NewPage = () => {
 
         <div className="actions">
           <div>
-            <Button variant="contained">Save</Button>
+            <Button variant="contained" onClick={e => e.stopPropagation()}>Save</Button>
           </div>
           <div>
             <Button variant="contained" onClick={handleOpen}>
@@ -140,7 +160,6 @@ const NewPage = () => {
       </div>
 
       {selectedElement && <PropertiesBar element={selectedElement} />}
-
     </div>
   );
 };
