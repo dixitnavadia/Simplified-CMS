@@ -1,42 +1,35 @@
 import * as React from "react";
-import "../styles/NewPage.css"; // Assuming you have a CSS file for styles
+import "../styles/NewPage.css";
+import LeftNavBar from "../components/LeftNavBar";
+import PropertiesBar from "../components/PropertiesBar";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 
-const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 400,
-  bgcolor: "black",
-  border: "2px solid #000",
-  boxShadow: 24,
-  p: 4,
-};
-
 const NewPage = () => {
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+  const [elements, setElements] = React.useState([]);
+  const [selectedElement, setSelectedElement] = React.useState(null);
+
+  const elementStyle = {
+    border: "1px dashed grey",
+    bgcolor: "darkgray",
+    color: "white",
+    padding: "10px",
+    alignContent: "center",
+  };
+
+  const addElement = (type) => {
+    setElements([...elements, { type }]);
+    handleClose();
+  };
 
   return (
     <div className="app">
-      <aside className="sidebar">
-        <h1>CMS</h1>
-        <nav>
-          <ul>
-            <li className="nav-bar-item">Dashboard</li>
-            <li className="nav-bar-item">Product Pages</li>
-            <li className="nav-bar-item">Media Library</li>
-            <li className="nav-bar-item">Settings</li>
-          </ul>
-        </nav>
-        <button className="new-page-btn">+ New Page</button>
-      </aside>
-
+      <LeftNavBar />
       <div className="main-layout">
         <div className="top-bar">
           <header className="header">
@@ -45,23 +38,38 @@ const NewPage = () => {
           <div className="user-icon">U</div>
         </div>
 
-        <main className="main-content">
-          <form className="editor">
-            <input type="text" className="field" placeholder="Beispiel Text" />
-            <input
-              type="image"
-              className="image"
-              placeholder="Upload Image"
-              src="https://placehold.jp/150x150.png"
-              alt="Product Image"
-            />
-          </form>
+        <div className="Elements">
+          
+          {elements.map((el, id) => {
+            const handleElementClick = () => setSelectedElement({ ...el, id });
+            if (el.type === "header") {
+              return (
+                <Box key={id} component="header" sx={elementStyle} onClick={handleElementClick}>
+                  Header
+                </Box>
+              );
+            }
+            if (el.type === "paragraph") {
+              return (
+                <Box key={id} component="p" sx={elementStyle} onClick={handleElementClick}>
+                  Paragraph
+                </Box>
+              );
+            }
+            if (el.type === "image") {
+              return (
+                <Box key={id} component="img" sx={elementStyle} alt="Image" onClick={handleElementClick}/>
+              );
+            }
+            return null;
+          })}
+        </div>
 
-          <div className="actions">
-            <div>
-              <Button variant="contained">Save</Button>
-            </div>
-            <div>
+        <div className="actions">
+          <div>
+            <Button variant="contained">Save</Button>
+          </div>
+          <div>
             <Button variant="contained" onClick={handleOpen}>
               Add New Element
             </Button>
@@ -71,28 +79,68 @@ const NewPage = () => {
               aria-labelledby="modal-modal-title"
               aria-describedby="modal-modal-description"
             >
-              <Box sx={style}>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  position: "absolute",
+                  top: "50%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  width: 900,
+                  bgcolor: "black",
+                  border: "2px solid #000",
+                  boxShadow: 24,
+                  p: 4,
+                }}
+              >
                 <Typography id="modal-modal-title" variant="h6" component="h2">
-                  Text in a modal
+                  Select an element
                 </Typography>
-                <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                  Duis mollis, est non commodo luctus, nisi erat porttitor
-                  ligula.
-                </Typography>
+                <Box
+                  sx={{
+                    display: "flex",
+                    marginTop: "20px",
+                    width: "100%",
+                    flexDirection: "row",
+                    gap: "10px",
+                    padding: "10px",
+                    backgroundColor: "black",
+                    borderRadius: "8px",
+                    justifyContent: "space-around",
+                  }}
+                >
+                  <Box
+                    component="header"
+                    sx={elementStyle}
+                    onClick={() => addElement("header")}
+                  >
+                    Header
+                  </Box>
+                  <Box
+                    component="p"
+                    sx={elementStyle}
+                    onClick={() => addElement("paragraph")}
+                  >
+                    Paragraph
+                  </Box>
+                  <Box
+                    component="image"
+                    sx={elementStyle}
+                    onClick={() => addElement("image")}
+                  >
+                    Image
+                  </Box>
+                </Box>
               </Box>
             </Modal>
-            </div>
           </div>
-        </main>
+        </div>
       </div>
 
-      <div className="right-panel">
-        <aside className="properties">
-          <h3>Quick Properties</h3>
-          <div className="prop-field">Font: Arial</div>
-          <div className="prop-field">Size: 14px</div>
-        </aside>
-      </div>
+      {selectedElement && <PropertiesBar element={selectedElement} />}
+
     </div>
   );
 };
