@@ -12,6 +12,11 @@ body {
   width: 100vw;
 }
 
+.app, .main-layout {
+  min-width: 0;
+  box-sizing: border-box;
+}
+
 .sidebar {
   width: 12vw;
   background: #181818;
@@ -232,11 +237,6 @@ h2 {
     justify-content: space-between;
     align-items: center;
     padding: 16px 8px;
-  }
-  .sidebar nav ul {
-    display: flex;
-    flex-direction: row;
-    gap: 12px;
   }
   .main-layout,
   .top-bar,

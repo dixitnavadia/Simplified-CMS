@@ -18,7 +18,7 @@ const UserMenu = ({ user = { name: "User", email: "user@email.com" } }) => {
   const open = Boolean(anchorEl);
 
   return (
-     <Box sx={{ width: "100%", display: "flex", justifyContent:"center", mt: -15, marginLeft: "auto", marginRight: 22 }}>
+     <Box sx={{ width: "100%", display: "flex", justifyContent:"center", mt: -15, marginLeft: "auto", marginBotton:"25px",'@media (max-width:700px)': { display: 'none' }}}>
     <Avatar
       sx={{ bgcolor: "slategray", cursor: "pointer" }}
       onClick={handleIconClick}
