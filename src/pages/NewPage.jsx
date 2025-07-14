@@ -2,6 +2,7 @@ import * as React from "react";
 import "../styles/NewPage.css";
 import LeftNavBar from "../components/LeftNavBar";
 import PropertiesBar from "../components/PropertiesBar";
+import UserMenu from "../components/UserMenu";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
@@ -35,64 +36,63 @@ const NewPage = () => {
           <header className="header">
             <h2>New Product Page</h2>
           </header>
-          <div className="user-icon">U</div>
         </div>
-
-        <div
-          className="Elements"
-        >
-          {elements.map((el, id) => {
-            const handleElementClick = (event) => {
-              event.stopPropagation(); 
-              setSelectedElement({ ...el, id });
-            };
-            if (el.type === "header") {
-              return (
-                <Box
-                  key={id}
-                  component="header"
-                  sx={elementStyle}
-                  onClick={handleElementClick}
-                >
-                  Header
-                </Box>
-              );
-            }
-            if (el.type === "paragraph") {
-              return (
-                <Box
-                  key={id}
-                  component="p"
-                  sx={elementStyle}
-                  onClick={handleElementClick}
-                >
-                  Paragraph
-                </Box>
-              );
-            }
-            if (el.type === "image") {
-              return (
-                <Box
-                  key={id}
-                  component="img"
-                  sx={elementStyle}
-                  alt="Image"
-                  onClick={handleElementClick}
-                />
-              );
-            }
-            return null;
-          })}
-        </div>
-
-        <div className="actions">
-          <div>
-            <Button variant="contained" onClick={e => e.stopPropagation()}>Save</Button>
+         <div style={{ display: "flex", flexDirection: "row", height: "100vh" }}>
+        
+        <div style={{ flex: 1 }}>
+        <div className="Elements">
+            {elements.map((el, id) => {
+              const handleElementClick = (event) => {
+                event.stopPropagation();
+                setSelectedElement({ ...el, id });
+              };
+              if (el.type === "header") {
+                return (
+                  <Box
+                    key={id}
+                    component="header"
+                    sx={elementStyle}
+                    onClick={handleElementClick}
+                  >
+                    Header
+                  </Box>
+                );
+              }
+              if (el.type === "paragraph") {
+                return (
+                  <Box
+                    key={id}
+                    component="p"
+                    sx={elementStyle}
+                    onClick={handleElementClick}
+                  >
+                    Paragraph
+                  </Box>
+                );
+              }
+              if (el.type === "image") {
+                return (
+                  <Box
+                    key={id}
+                    component="img"
+                    sx={elementStyle}
+                    alt="Image"
+                    onClick={handleElementClick}
+                  />
+                );
+              }
+              return null;
+            })}
           </div>
-          <div>
-            <Button variant="contained" onClick={handleOpen}>
-              Add New Element
-            </Button>
+          <div className="actions">
+            <div>
+              <Button variant="contained" onClick={e => e.stopPropagation()}>Save</Button>
+            </div>
+            <div>
+              <Button variant="contained" onClick={handleOpen}>
+                Add New Element
+              </Button>
+             
             <Modal
               open={open}
               onClose={handleClose}
@@ -158,9 +158,13 @@ const NewPage = () => {
           </div>
         </div>
       </div>
-
-      {selectedElement && <PropertiesBar element={selectedElement} />}
+       <div className="right-panel" onClick={e => e.stopPropagation()}>
+          <UserMenu user={{ name: "Max", email: "Max.Mustermann@gmail.com" }} />
+          {selectedElement && <PropertiesBar element={selectedElement} />}
+        </div>
+      </div>
     </div>
+  </div>
   );
 };
 

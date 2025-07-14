@@ -61,9 +61,11 @@ body {
 .right-panel {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  width: 10vw;
   padding-top: 32px;
+  width: 320;
+  align-items: flex-end;
+  margin-left: 10px;
+  margin-right: 10px;
 }
 
 .user-icon {
