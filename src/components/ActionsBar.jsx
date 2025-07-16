@@ -1,14 +1,14 @@
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 
-const ActionsBar = ({ onSave, onAdd }) => (
+const ActionsBar = ({ onAdd }) => (
   <Box sx={{ display: "flex", gap: 2, mt: 3 }}>
     <Button
       variant="contained"
-      onClick={(e) => {
-        e.stopPropagation();
-        onSave && onSave();
-      }}
+      // // onClick={(e) => {
+      // //   e.stopPropagation();
+     
+      // }}
       sx={{
         bgcolor: "#1976d2",
         color: "#fff",

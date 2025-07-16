@@ -82,7 +82,7 @@ const LeftNavBar = () => {
       <Button
         variant="contained"
         sx={{
-          mt: "auto",
+          mt: "10%",
           bgcolor: "#1976d2",
           color: "#fff",
           borderRadius: "10px",

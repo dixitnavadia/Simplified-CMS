@@ -36,19 +36,19 @@ const ElementRenderer = ({ el, id, onSelect, onDelete, onEdit }) => {
     onSelect && onSelect({ ...el, id });
   };
 
-  // Save header changes
+
   const handleHeaderSave = () => {
     setEditingHeader(false);
     if (onEdit) onEdit(id, { ...el, text: headerValue });
   };
 
-  // Save paragraph changes
+  
   const handleParagraphSave = () => {
     setEditingParagraph(false);
     if (onEdit) onEdit(id, { ...el, text: paragraphValue });
   };
 
-  // Handle image upload
+
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
     if (file) {
