@@ -3,47 +3,48 @@ import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import Button from "@mui/material/Button";
 import Link from "@mui/material/Link";
 import axios from "axios";
-import { v4 as uuidv4 } from "uuid";
-import {useRef,useState} from "react"
+import { useRef, useState } from "react";
+import { useNavigate } from "react-router-dom"
 
-const Register = () => {
-   const [equal,setEqual] = useState(false);
-    const formRef = useRef();
-  
-     const checkPassword = () => {
-        const form = formRef.current;
-        form.password.value === form.confirmPassword.value ? setEqual(true) : setEqual(false);
-        if(!form.confirmPassword.value)  {
-            setEqual(false);
-        }
-    }
-    const registerUser = async(e) => {
-        e.preventDefault();
-        const form = formRef.current;
-        const formData = {
-            id: uuidv4(),
-            fullname: form.fullname.value,
-            email: form.email.value,
-            password: form.password.value,
-            role: 'guest'
-        }
+const Login = ({handleLogin}) => {
+     const [fieldType,setFieldType] = useState(true);
+    const navigator = useNavigate();
+    const valueEmail = useRef();
+    const valuePassword = useRef();
+
+    const handleClick = async() => {
+        // console.log(valueEmail.current.value);
+        // console.log(valuePassword.current.value);
+        const data = {
+            email: valueEmail.current.value,
+            password: valuePassword.current.value
+        };
+      
         const config = {
-            url: "http://localhost:3003/api/register",
+            url: "http://localhost:5173/api/login",
             method: "post",
             headers: {
                 "Content-Type": "application/json"
             },
-            data: JSON.stringify(formData)
+            data: data
         }
-        const resp = await axios(config);
-        console.log(resp.data);
-        //navigiere login
-        
-    } 
+        try {
+            console.log(config);
+            const response = await axios(config);
+            console.log(response.data);
+            
+            localStorage.setItem("token",response.data.token);
+            handleLogin();
+            navigator("/NewPage");
 
+        } catch(e) {
+            console.log(e);
+        }
+    }
 
   return (
     <Box
@@ -71,7 +72,7 @@ const Register = () => {
         }}
       >
         <Typography variant="h5" component="h2" sx={{ mb: 2, color: "#fff" }}>
-          Register
+          Login
         </Typography>
         <Box
           component="form"
@@ -84,54 +85,43 @@ const Register = () => {
           }}
         >
           <TextField
-            required
-            label="Full Name"
-            variant="outlined"
-            fullWidth
-            name="fullname"
-            autoComplete="name"
-            InputLabelProps={{ style: { color: "#bbb" } }}
-            InputProps={{
-              style: { color: "#fff", background: "#181818" },
-            }}
-          />
-          <TextField
-            required
+          required
+          inputRef={valueEmail}
             label="Email"
             type="email"
-            name="email"
             variant="outlined"
             fullWidth
             autoComplete="email"
+            name="email"
+            
             InputLabelProps={{ style: { color: "#bbb" } }}
             InputProps={{
               style: { color: "#fff", background: "#181818" },
             }}
           />
           <TextField
+            required
+            inputRef={valuePassword}
             label="Password"
-            type="password"
-            name="password"
+            type={fieldType ? "password" : "text"}
             variant="outlined"
             fullWidth
-            autoComplete="new-password"
+            autoComplete="current-password"
             InputLabelProps={{ style: { color: "#bbb" } }}
             InputProps={{
               style: { color: "#fff", background: "#181818" },
             }}
-          />
-          <TextField
-            label="Re-type Password"
-            type="password"
-            name="confirmPassword"
-            variant="outlined"
-            fullWidth
-            autoComplete="new-password"
-            InputLabelProps={{ style: { color: "#bbb" } }}
-            InputProps={{
-              style: { color: "#fff", background: "#181818" },
-            }}
-          />
+          /><VisibilityIcon onClick={() => setFieldType(!fieldType)}/>
+          
+          <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+            <Link
+              href="#"
+              underline="hover"
+              sx={{ color: "#90caf9", fontSize: 14 }}
+            >
+              Forgot Password?
+            </Link>
+          </Box>
           <Button
             type="submit"
             variant="contained"
@@ -143,14 +133,15 @@ const Register = () => {
               color: "#fff",
             }}
             fullWidth
+            onClick={()=> handleClick()}
           >
-            Register
+            Login
           </Button>
         </Box>
         <Typography variant="body2" sx={{ mt: 2, color: "#bbb" }}>
-          Already have an account?{" "}
-          <Link href="#" underline="hover" sx={{ color: "#90caf9" }}>
-            Login
+          Don’t have an account?{" "}
+          <Link href="#" underline="hover" sx={{ color: "#90caf9" }} onClick={() => navigator("/register")}>
+            Register
           </Link>
         </Typography>
       </Paper>
@@ -158,4 +149,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default Login;
