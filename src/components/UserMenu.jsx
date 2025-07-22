@@ -3,6 +3,7 @@ import Box from "@mui/material/Box";
 import Avatar from "@mui/material/Avatar";
 import Popover from "@mui/material/Popover";
 import Button from "@mui/material/Button";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 const UserMenu = ({ user = { name: "User", email: "user@email.com" } }) => {
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -49,7 +50,7 @@ const UserMenu = ({ user = { name: "User", email: "user@email.com" } }) => {
           <Button
             variant="contained"
             color="error"
-            sx={{ mt: 2, width: "100%" }}
+            sx={{ mt: 2, width: "100%" }}         
           >
             Log Out
           </Button>

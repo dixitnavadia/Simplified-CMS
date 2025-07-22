@@ -5,8 +5,46 @@ import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Link from "@mui/material/Link";
+import axios from "axios";
+import { v4 as uuidv4 } from "uuid";
+import {useRef,useState} from "react"
 
 const Register = () => {
+   const [equal,setEqual] = useState(false);
+    const formRef = useRef();
+  
+     const checkPassword = () => {
+        const form = formRef.current;
+        form.password.value === form.confirmPassword.value ? setEqual(true) : setEqual(false);
+        if(!form.confirmPassword.value)  {
+            setEqual(false);
+        }
+    }
+    const registerUser = async(e) => {
+        e.preventDefault();
+        const form = formRef.current;
+        const formData = {
+            id: uuidv4(),
+            fullname: form.fullname.value,
+            email: form.email.value,
+            password: form.password.value,
+            role: 'guest'
+        }
+        const config = {
+            url: "http://localhost:3003/api/register",
+            method: "post",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            data: JSON.stringify(formData)
+        }
+        const resp = await axios(config);
+        console.log(resp.data);
+        //navigiere login
+        
+    } 
+
+
   return (
     <Box
       className="auth-container"
@@ -46,9 +84,11 @@ const Register = () => {
           }}
         >
           <TextField
+            required
             label="Full Name"
             variant="outlined"
             fullWidth
+            name="fullname"
             autoComplete="name"
             InputLabelProps={{ style: { color: "#bbb" } }}
             InputProps={{
@@ -56,8 +96,10 @@ const Register = () => {
             }}
           />
           <TextField
+            required
             label="Email"
             type="email"
+            name="email"
             variant="outlined"
             fullWidth
             autoComplete="email"
@@ -69,6 +111,7 @@ const Register = () => {
           <TextField
             label="Password"
             type="password"
+            name="password"
             variant="outlined"
             fullWidth
             autoComplete="new-password"
@@ -80,6 +123,7 @@ const Register = () => {
           <TextField
             label="Re-type Password"
             type="password"
+            name="confirmPassword"
             variant="outlined"
             fullWidth
             autoComplete="new-password"

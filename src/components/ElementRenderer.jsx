@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
@@ -31,23 +31,26 @@ const ElementRenderer = ({ el, id, onSelect, onDelete, onEdit }) => {
   const [paragraphValue, setParagraphValue] = useState(el.text || "");
   const fileInputRef = useRef();
 
+  
+  useEffect(() => {
+    setHeaderValue(el.text || "");
+    setParagraphValue(el.text || "");
+  }, [el.text]);
+
   const handleElementClick = (event) => {
     event.stopPropagation();
     onSelect && onSelect({ ...el, id });
   };
-
 
   const handleHeaderSave = () => {
     setEditingHeader(false);
     if (onEdit) onEdit(id, { ...el, text: headerValue });
   };
 
-  
   const handleParagraphSave = () => {
     setEditingParagraph(false);
     if (onEdit) onEdit(id, { ...el, text: paragraphValue });
   };
-
 
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
@@ -62,7 +65,14 @@ const ElementRenderer = ({ el, id, onSelect, onDelete, onEdit }) => {
 
   return (
     <Paper elevation={6} sx={elementStyle} onClick={handleElementClick}>
-      <Box sx={{ position: "absolute", top: 17, right: 18, justifyContent: "flex-end" }}>
+      <Box
+        sx={{
+          position: "absolute",
+          top: 17,
+          right: 18,
+          justifyContent: "flex-end",
+        }}
+      >
         <CloseOutlinedIcon
           fontSize="medium"
           color="error"
@@ -81,35 +91,35 @@ const ElementRenderer = ({ el, id, onSelect, onDelete, onEdit }) => {
               autoFocus
               fullWidth
               value={headerValue}
-              onChange={e => setHeaderValue(e.target.value)}
+              onChange={(e) => setHeaderValue(e.target.value)}
               onBlur={handleHeaderSave}
-              onKeyDown={e => {
+              onKeyDown={(e) => {
                 if (e.key === "Enter") handleHeaderSave();
               }}
               inputProps={{
                 style: {
-                  fontWeight: 700,
-                  fontSize: "2rem",
+                  fontWeight: el.fontWeight || 700,
+                  fontSize: el.fontSize || "2rem",
                   color: "#fff",
                   background: "transparent",
                   border: "none",
                   outline: "none",
                   padding: 0,
-                }
+                },
               }}
             />
           ) : (
             <h1
               style={{
-                fontWeight: 700,
+                fontWeight: el.fontWeight || 700,
                 letterSpacing: 1,
-                fontSize: "2rem",
+                fontSize: el.fontSize || "2rem",
                 margin: 0,
                 color: "#fff",
                 background: "transparent",
                 cursor: "text",
               }}
-              onClick={e => {
+              onClick={(e) => {
                 e.stopPropagation();
                 setEditingHeader(true);
                 onSelect && onSelect({ ...el, id });
@@ -130,34 +140,37 @@ const ElementRenderer = ({ el, id, onSelect, onDelete, onEdit }) => {
               fullWidth
               autoFocus
               value={paragraphValue}
-              onChange={e => setParagraphValue(e.target.value)}
+              onChange={(e) => setParagraphValue(e.target.value)}
               onBlur={handleParagraphSave}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleParagraphSave();
+              }}
               inputProps={{
                 style: {
-                  fontWeight: 400,
-                  fontSize: "1rem",
+                  fontWeight: el.fontWeight || 400,
+                  fontSize: el.fontSize || "1rem",
                   color: "#fff",
                   background: "transparent",
                   border: "none",
                   outline: "none",
                   padding: 0,
                   whiteSpace: "pre-line",
-                }
+                },
               }}
             />
           ) : (
             <p
               style={{
-                fontWeight: 400,
+                fontWeight: el.fontWeight || 400,
                 letterSpacing: 0.5,
-                fontSize: "1rem",
+                fontSize: el.fontSize || "1rem",
                 margin: 0,
                 color: "#fff",
                 background: "transparent",
                 cursor: "text",
                 whiteSpace: "pre-line",
               }}
-              onClick={e => {
+              onClick={(e) => {
                 e.stopPropagation();
                 setEditingParagraph(true);
                 onSelect && onSelect({ ...el, id });
@@ -169,15 +182,22 @@ const ElementRenderer = ({ el, id, onSelect, onDelete, onEdit }) => {
         </Box>
       )}
       {el.type === "image" && (
-        <Box sx={{ mt: 2, display: "flex", flexDirection: "column", alignItems: "center" }}>
+        <Box
+          sx={{
+            mt: 2,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
           {el.src ? (
             <Box
               component="img"
               src={el.src}
-              alt="Image"
+              alt={el.alt || "Image"}
               sx={{
-                width: 120,
-                height: 120,
+                width: el.width || "120px",
+                height: el.height || "120px",
                 objectFit: "cover",
                 borderRadius: "10px",
                 background: "#181818",
@@ -201,7 +221,7 @@ const ElementRenderer = ({ el, id, onSelect, onDelete, onEdit }) => {
                 mb: 1,
                 "&:hover": { borderColor: "#1976d2", background: "#222" },
               }}
-              onClick={e => {
+              onClick={(e) => {
                 e.stopPropagation();
                 fileInputRef.current.click();
               }}

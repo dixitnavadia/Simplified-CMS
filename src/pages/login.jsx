@@ -1,35 +1,3 @@
-// import React from 'react';
-// import '../styles/Authenticate.css';
-
-// const Login = () => {
-//   return (
-//     <div className="auth-container">
-//       <div className="auth-card">
-//         <h2 className="auth-title">Login</h2>
-
-//         <form className="auth-form">
-//           <input type="email" placeholder="Max@Mustermann.com" className="auth-input" />
-
-//           <div className="password-wrapper">
-//             <input type="password" placeholder="••••••••" className="auth-input forgot-link" />
-//             <a href="#" className="forgot-password-link">Forgot Password?</a>
-//           </div>
-
-//           <button type="submit" className="auth-button">Login</button>
-//         </form>
-
-//         <p className="auth-footer-text">
-//           Don’t have an account? <a href="#">Register</a>
-//         </p>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default Login;
-
-// Umbau mit MUI
-
 import React from "react";
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
@@ -37,6 +5,7 @@ import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Link from "@mui/material/Link";
+import { Navigate } from "react-router-dom";
 
 const Login = () => {
   return (
@@ -125,7 +94,7 @@ const Login = () => {
         </Box>
         <Typography variant="body2" sx={{ mt: 2, color: "#bbb" }}>
           Don’t have an account?{" "}
-          <Link href="#" underline="hover" sx={{ color: "#90caf9" }}>
+          <Link href="#" underline="hover" sx={{ color: "#90caf9" }} onClick={() => <Navigate to="./register"/>}>
             Register
           </Link>
         </Typography>

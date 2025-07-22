@@ -1,52 +1,19 @@
-// import * as React from "react";
-// import "../styles/NewPage.css";
-
-// const PropertiesBar = ({ element }) => {
-//   if (!element) return null;
-
-//   return (
-//     <>
-//       <aside className="properties">
-//         <h3>Quick Properties</h3>
-//         {element.type === "header" && (
-//           <>
-//             <div className="prop-field">Header Text</div>
-//             <div className="prop-field">Font Size</div>
-//             <div className="prop-field">Font Weight</div>
-//           </>
-//         )}
-//         {element.type === "paragraph" && (
-//           <>
-//             <div className="prop-field">Paragraph Text</div>
-//             <div className="prop-field">Font Size</div>
-
-//           </>
-//         )}
-//         {element.type === "image" && (
-//           <>
-//             <div className="prop-field">Image URL</div>
-//             <div className="prop-field">Width</div>
-//             <div className="prop-field">Height</div>
-//             <div className="prop-field">Alt Text</div>
-//           </>
-//         )}
-//       </aside>
-//     </>
-//   );
-// };
-
-// export default PropertiesBar;
-
-// Umbau mit MUI
-
 import * as React from "react";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import InputAdornment from "@mui/material/InputAdornment";
 
-const PropertiesBar = ({ element }) => {
+const PropertiesBar = ({ element, onEdit }) => {
   if (!element) return null;
+
+  const handleChange = (property, value) => {
+    console.log(`Changing ${property} to ${value} for element ID: ${element.id}`);
+    if (onEdit && element.id !== undefined) {
+      onEdit(element.id, { ...element, [property]: value });
+    }
+  };
 
   return (
     <Paper
@@ -62,74 +29,223 @@ const PropertiesBar = ({ element }) => {
         boxShadow: "0 2px 8px rgba(0,0,0,0.10)",
       }}
     >
-      <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+      <Typography variant="h6" sx={{ mb: 3, fontWeight: 600 }}>
         Quick Properties
       </Typography>
-      <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
         {element.type === "header" && (
           <>
-            <Button
+            <TextField
+              label="Header Text"
               variant="outlined"
-              sx={{ color: "#fff", borderColor: "#555" }}
-            >
-              Header Text
-            </Button>
-            <Button
+              value={element.text || ""}
+              onChange={(e) => handleChange("text", e.target.value)}
+              onBlur={(e) => {
+                handleChange("text", e.target.value);
+              }}
+              sx={{
+                input: { color: "#fff" },
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": { borderColor: "#555" },
+                  "&:hover fieldset": { borderColor: "#777" },
+                  "&.Mui-focused fieldset": { borderColor: "#90caf9" },
+                },
+                "& .MuiInputLabel-root": {
+                  color: "#aaa",
+                  "&.Mui-focused": { color: "#90caf9" },
+                },
+              }}
+            />
+            <TextField
+              label="Font Size"
               variant="outlined"
-              sx={{ color: "#fff", borderColor: "#555" }}
-            >
-              Font Size
-            </Button>
-            <Button
+              value={element.fontSize || "2rem"}
+              onChange={(e) => handleChange("fontSize", e.target.value)}
+              onBlur={(e) => {
+                handleChange("fontSize", e.target.value);
+              }}
+              InputProps={{
+                endAdornment: <InputAdornment position="end" sx={{ color: "#aaa" }}>px/rem</InputAdornment>,
+              }}
+              sx={{
+                input: { color: "#fff" },
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": { borderColor: "#555" },
+                  "&:hover fieldset": { borderColor: "#777" },
+                  "&.Mui-focused fieldset": { borderColor: "#90caf9" },
+                },
+                "& .MuiInputLabel-root": {
+                  color: "#aaa",
+                  "&.Mui-focused": { color: "#90caf9" },
+                },
+              }}
+            />
+            <TextField
+              label="Font Weight"
               variant="outlined"
-              sx={{ color: "#fff", borderColor: "#555" }}
-            >
-              Font Weight
-            </Button>
+              value={element.fontWeight || "700"}
+              onChange={(e) => handleChange("fontWeight", e.target.value)}
+              onBlur={(e) => {
+                handleChange("fontWeight", e.target.value);
+              }}
+              sx={{
+                input: { color: "#fff" },
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": { borderColor: "#555" },
+                  "&:hover fieldset": { borderColor: "#777" },
+                  "&.Mui-focused fieldset": { borderColor: "#90caf9" },
+                },
+                "& .MuiInputLabel-root": {
+                  color: "#aaa",
+                  "&.Mui-focused": { color: "#90caf9" },
+                },
+              }}
+            />
           </>
         )}
         {element.type === "paragraph" && (
           <>
-            <Button
+            <TextField
+              label="Paragraph Text"
               variant="outlined"
-              sx={{ color: "#fff", borderColor: "#555" }}
-            >
-              Paragraph Text
-            </Button>
-            <Button
+              multiline
+              rows={3}
+              value={element.text || ""}
+              onChange={(e) => handleChange("text", e.target.value)}
+              onBlur={(e) => {
+                handleChange("text", e.target.value);
+              }}
+              sx={{
+                textarea: { color: "#fff" },
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": { borderColor: "#555" },
+                  "&:hover fieldset": { borderColor: "#777" },
+                  "&.Mui-focused fieldset": { borderColor: "#90caf9" },
+                },
+                "& .MuiInputLabel-root": {
+                  color: "#aaa",
+                  "&.Mui-focused": { color: "#90caf9" },
+                },
+              }}
+            />
+            <TextField
+              label="Font Size"
               variant="outlined"
-              sx={{ color: "#fff", borderColor: "#555" }}
-            >
-              Font Size
-            </Button>
+              value={element.fontSize || "1rem"}
+              onChange={(e) => handleChange("fontSize", e.target.value)}
+              onBlur={(e) => {
+                handleChange("fontSize", e.target.value);
+              }}
+              InputProps={{
+                endAdornment: <InputAdornment position="end" sx={{ color: "#aaa" }}>px/rem</InputAdornment>,
+              }}
+              sx={{
+                input: { color: "#fff" },
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": { borderColor: "#555" },
+                  "&:hover fieldset": { borderColor: "#777" },
+                  "&.Mui-focused fieldset": { borderColor: "#90caf9" },
+                },
+                "& .MuiInputLabel-root": {
+                  color: "#aaa",
+                  "&.Mui-focused": { color: "#90caf9" },
+                },
+              }}
+            />
           </>
         )}
         {element.type === "image" && (
           <>
-            <Button
+            <TextField
+              label="Image URL"
               variant="outlined"
-              sx={{ color: "#fff", borderColor: "#555" }}
-            >
-              Image URL
-            </Button>
-            <Button
+              value={element.src || ""}
+              onChange={(e) => handleChange("src", e.target.value)}
+              onBlur={(e) => {
+                handleChange("src", e.target.value);
+              }}
+              sx={{
+                input: { color: "#fff" },
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": { borderColor: "#555" },
+                  "&:hover fieldset": { borderColor: "#777" },
+                  "&.Mui-focused fieldset": { borderColor: "#90caf9" },
+                },
+                "& .MuiInputLabel-root": {
+                  color: "#aaa",
+                  "&.Mui-focused": { color: "#90caf9" },
+                },
+              }}
+            />
+            <TextField
+              label="Width"
               variant="outlined"
-              sx={{ color: "#fff", borderColor: "#555" }}
-            >
-              Width
-            </Button>
-            <Button
+              value={element.width || "120px"}
+              onChange={(e) => handleChange("width", e.target.value)}
+              onBlur={(e) => {
+                handleChange("width", e.target.value);
+              }}
+              InputProps={{
+                endAdornment: <InputAdornment position="end" sx={{ color: "#aaa" }}>px</InputAdornment>,
+              }}
+              sx={{
+                input: { color: "#fff" },
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": { borderColor: "#555" },
+                  "&:hover fieldset": { borderColor: "#777" },
+                  "&.Mui-focused fieldset": { borderColor: "#90caf9" },
+                },
+                "& .MuiInputLabel-root": {
+                  color: "#aaa",
+                  "&.Mui-focused": { color: "#90caf9" },
+                },
+              }}
+            />
+            <TextField
+              label="Height"
               variant="outlined"
-              sx={{ color: "#fff", borderColor: "#555" }}
-            >
-              Height
-            </Button>
-            <Button
+              value={element.height || "120px"}
+              onChange={(e) => handleChange("height", e.target.value)}
+              onBlur={(e) => {
+                handleChange("height", e.target.value);
+              }}
+              InputProps={{
+                endAdornment: <InputAdornment position="end" sx={{ color: "#aaa" }}>px</InputAdornment>,
+              }}
+              sx={{
+                input: { color: "#fff" },
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": { borderColor: "#555" },
+                  "&:hover fieldset": { borderColor: "#777" },
+                  "&.Mui-focused fieldset": { borderColor: "#90caf9" },
+                },
+                "& .MuiInputLabel-root": {
+                  color: "#aaa",
+                  "&.Mui-focused": { color: "#90caf9" },
+                },
+              }}
+            />
+            <TextField
+              label="Alt Text"
               variant="outlined"
-              sx={{ color: "#fff", borderColor: "#555" }}
-            >
-              Alt Text
-            </Button>
+              value={element.alt || ""}
+              onChange={(e) => handleChange("alt", e.target.value)}
+              onBlur={(e) => {
+                handleChange("alt", e.target.value);
+              }}
+              sx={{
+                input: { color: "#fff" },
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": { borderColor: "#555" },
+                  "&:hover fieldset": { borderColor: "#777" },
+                  "&.Mui-focused fieldset": { borderColor: "#90caf9" },
+                },
+                "& .MuiInputLabel-root": {
+                  color: "#aaa",
+                  "&.Mui-focused": { color: "#90caf9" },
+                },
+              }}
+            />
           </>
         )}
       </Box>
