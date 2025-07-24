@@ -9,10 +9,11 @@ import Link from "@mui/material/Link";
 import axios from "axios";
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom"
+import { InputAdornment, IconButton } from "@mui/material";
 
 const Login = ({handleLogin}) => {
      const [fieldType,setFieldType] = useState(true);
-    const navigator = useNavigate();
+    const navigate = useNavigate();
     const valueEmail = useRef();
     const valuePassword = useRef();
 
@@ -39,7 +40,7 @@ const Login = ({handleLogin}) => {
             
             localStorage.setItem("token",response.data.token);
             handleLogin();
-            navigator("/NewPage");
+            navigate("/NewPage");
 
         } catch(e) {
             console.log(e);
@@ -103,6 +104,7 @@ const Login = ({handleLogin}) => {
             required
             inputRef={valuePassword}
             label="Password"
+            name="password"
             type={fieldType ? "password" : "text"}
             variant="outlined"
             fullWidth
@@ -110,8 +112,20 @@ const Login = ({handleLogin}) => {
             InputLabelProps={{ style: { color: "#bbb" } }}
             InputProps={{
               style: { color: "#fff", background: "#181818" },
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    onMouseDownCapture={() => setFieldType(!fieldType)}
+                    onMouseUp={() => setFieldType(!fieldType)}
+                    edge="end"
+                    sx={{ color: "#bbb" }}
+                  >
+                    <VisibilityIcon />
+                  </IconButton>
+                </InputAdornment>
+              ),
             }}
-          /><VisibilityIcon onClick={() => setFieldType(!fieldType)}/>
+          />
           
           <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
             <Link
@@ -142,7 +156,7 @@ const Login = ({handleLogin}) => {
         </Box>
         <Typography variant="body2" sx={{ mt: 2, color: "#bbb" }}>
           Don’t have an account?{" "}
-          <Link href="#" underline="hover" sx={{ color: "#90caf9" }} onClick={() => navigator("/register")}>
+          <Link href="#" underline="hover" sx={{ color: "#90caf9" }} onClick={() => navigate("/register")}>
             Register
           </Link>
         </Typography>
