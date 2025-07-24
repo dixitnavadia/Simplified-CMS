@@ -25,7 +25,7 @@ const Login = ({handleLogin}) => {
         };
       
         const config = {
-            url: "http://localhost:5173/api/login",
+            url: "http://localhost:3000/api/login",
             method: "post",
             headers: {
                 "Content-Type": "application/json"
@@ -133,7 +133,9 @@ const Login = ({handleLogin}) => {
               color: "#fff",
             }}
             fullWidth
-            onClick={()=> handleClick()}
+            onClick={(e)=> {
+              e.preventDefault();
+              handleClick()}}
           >
             Login
           </Button>

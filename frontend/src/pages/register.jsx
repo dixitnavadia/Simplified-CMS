@@ -31,7 +31,7 @@ const Register = () => {
             role: 'guest'
         }
         const config = {
-            url: "http://localhost:5173/api/register",
+            url: "http://localhost:3000/api/register",
             method: "post",
             headers: {
                 "Content-Type": "application/json"
