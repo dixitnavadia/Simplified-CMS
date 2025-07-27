@@ -10,16 +10,19 @@ import axios from "axios";
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom"
 import { InputAdornment, IconButton } from "@mui/material";
+import { useUser } from "../context/UserContext";
 
 const Login = ({handleLogin}) => {
-     const [fieldType,setFieldType] = useState(true);
+    const [fieldType,setFieldType] = useState(true);
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
     const valueEmail = useRef();
     const valuePassword = useRef();
+    const { updateUser } = useUser();
 
     const handleClick = async() => {
-        // console.log(valueEmail.current.value);
-        // console.log(valuePassword.current.value);
+        setLoading(true);
+        
         const data = {
             email: valueEmail.current.value,
             password: valuePassword.current.value
@@ -33,17 +36,29 @@ const Login = ({handleLogin}) => {
             },
             data: data
         }
+        
         try {
             console.log(config);
             const response = await axios(config);
-            console.log(response.data);
+            console.log('Login response:', response.data);
             
-            localStorage.setItem("token",response.data.token);
+            // Store token and user data
+            localStorage.setItem("token", response.data.token);
+            
+            // Update user context with received user data
+            if (response.data.user) {
+                updateUser(response.data.user);
+                console.log('👤 User data stored:', response.data.user);
+            }
+            
             handleLogin();
             navigate("/NewPage");
 
         } catch(e) {
-            console.log(e);
+            console.error('Login error:', e);
+            alert(e.response?.data?.message || 'Login failed');
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -140,10 +155,12 @@ const Login = ({handleLogin}) => {
             type="submit"
             variant="contained"
             color="primary"
+            disabled={loading}
             sx={{
               mt: 1,
               bgcolor: "#1976d2",
               "&:hover": { bgcolor: "#1565c0" },
+              "&:disabled": { bgcolor: "#555" },
               color: "#fff",
             }}
             fullWidth
@@ -151,11 +168,11 @@ const Login = ({handleLogin}) => {
               e.preventDefault();
               handleClick()}}
           >
-            Login
+            {loading ? "Logging in..." : "Login"}
           </Button>
         </Box>
         <Typography variant="body2" sx={{ mt: 2, color: "#bbb" }}>
-          Don’t have an account?{" "}
+          Don't have an account?{" "}
           <Link href="#" underline="hover" sx={{ color: "#90caf9" }} onClick={() => navigate("/register")}>
             Register
           </Link>

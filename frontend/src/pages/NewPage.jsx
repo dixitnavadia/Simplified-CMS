@@ -5,18 +5,26 @@ import UserMenu from "../components/UserMenu";
 import ElementRenderer from "../components/ElementRenderer";
 import AddElementModal from "../components/AddElementModal";
 import ActionsBar from "../components/ActionsBar";
+import PageMetaData from "../components/PageMetaData";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { Snackbar, Alert } from "@mui/material";
 
-const NewPage = () => {
+const NewPage = ({handleLogout}) => {
   const [open, setOpen] = React.useState(false);
   const [elements, setElements] = React.useState([]);
   const [selectedElement, setSelectedElement] = React.useState(null);
+  const [pageMetaData, setPageMetaData] = React.useState([]);
   const [snackbar, setSnackbar] = React.useState({
     open: false,
     message: "",
     severity: "success"
+  });
+
+  // Initialize PageMetaData hook
+  const metaDataManager = PageMetaData({ 
+    elements, 
+    onMetaDataChange: setPageMetaData 
   });
 
   // Load elements from localStorage on initial render
@@ -25,8 +33,9 @@ const NewPage = () => {
     if (savedElements) {
       try {
         setElements(JSON.parse(savedElements));
+        console.log('🔄 Loaded elements from localStorage:', JSON.parse(savedElements));
       } catch (e) {
-        console.error("Failed to parse saved elements", e);
+        console.error("❌ Failed to parse saved elements", e);
       }
     }
   }, []);
@@ -35,6 +44,7 @@ const NewPage = () => {
   const handleClose = () => setOpen(false);
 
   const addElement = (type) => {
+    console.log(`➕ Adding new element of type: ${type}`);
     const newElements = [...elements, { type }];
     setElements(newElements);
     saveElementsToJson(newElements);
@@ -42,17 +52,19 @@ const NewPage = () => {
   };
 
   const deleteElement = (id) => {
+    console.log(`🗑️ Deleting element with id: ${id}`);
     const newElements = elements.filter((_, i) => i !== id);
     setElements(newElements);
     saveElementsToJson(newElements);
     
     if (selectedElement && selectedElement.id === id) {
       setSelectedElement(null);
+      console.log('🔄 Cleared selected element');
     }
   };
 
   const handleEditElement = (id, updatedEl) => {
-    console.log("Editing element:", id, updatedEl);
+    console.log("✏️ Editing element:", id, updatedEl);
     
     // Update the elements array
     const newElements = elements.map((el, idx) => 
@@ -65,6 +77,7 @@ const NewPage = () => {
     // If this is the currently selected element, update that too
     if (selectedElement && selectedElement.id === id) {
       setSelectedElement({ ...selectedElement, ...updatedEl });
+      console.log('🔄 Updated selected element:', { ...selectedElement, ...updatedEl });
     }
   };
 
@@ -72,14 +85,16 @@ const NewPage = () => {
   const saveElementsToJson = (elementsToSave) => {
     try {
       localStorage.setItem("page-elements", JSON.stringify(elementsToSave));
+      console.log('💾 Elements saved to localStorage:', elementsToSave);
     } catch (e) {
-      console.error("Failed to save elements", e);
+      console.error("❌ Failed to save elements", e);
     }
   };
 
   // Manual save function for the Save button
   const handleSave = () => {
     saveElementsToJson(elements);
+    console.log('💾 Manual save triggered');
     setSnackbar({
       open: true,
       message: "Page saved successfully!",
@@ -91,11 +106,14 @@ const NewPage = () => {
     setSnackbar({ ...snackbar, open: false });
   };
 
-  // Debug function to help diagnose issues
+  // Debug logging for state changes
   React.useEffect(() => {
+    console.group('🔄 State Update');
     console.log("Elements:", elements);
     console.log("Selected Element:", selectedElement);
-  }, [elements, selectedElement]);
+    console.log("Page Metadata:", pageMetaData);
+    console.groupEnd();
+  }, [elements, selectedElement, pageMetaData]);
 
   return (
     <Box
@@ -138,7 +156,10 @@ const NewPage = () => {
                 />
               ))}
             </Box>
-            <ActionsBar onAdd={handleOpen} onSave={handleSave} />
+            <ActionsBar 
+              onAdd={handleOpen} 
+              onSave={handleSave}
+            />
             <AddElementModal
               open={open}
               handleClose={handleClose}
@@ -159,9 +180,7 @@ const NewPage = () => {
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <UserMenu
-              user={{ name: "Max", email: "Max.Mustermann@gmail.com" }}
-            />
+            <UserMenu handleLogout={handleLogout} />
             {selectedElement && (
               <PropertiesBar
                 element={selectedElement}
