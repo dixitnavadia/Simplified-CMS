@@ -4,6 +4,7 @@ import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
+import MenuItem from "@mui/material/MenuItem";
 
 const PropertiesBar = ({ element, onEdit }) => {
   if (!element) return null;
@@ -14,6 +15,33 @@ const PropertiesBar = ({ element, onEdit }) => {
       onEdit(element.id, { ...element, [property]: value });
     }
   };
+
+  // Helper function to ensure font size has 'px' unit
+  const formatFontSize = (fontSize) => {
+    if (!fontSize) return "";
+    // If it's just a number, add 'px'
+    if (/^\d+$/.test(fontSize)) {
+      return fontSize + "px";
+    }
+    return fontSize;
+  };
+
+  // Helper function to extract numeric value from font size
+  const getFontSizeValue = (fontSize) => {
+    if (!fontSize) return "";
+    // Extract number from strings like "32px", "2rem", etc.
+    const match = fontSize.match(/^\d+/);
+    return match ? match[0] : fontSize;
+  };
+
+  // Font family options
+  const fontFamilyOptions = [
+    { value: "Roboto, sans-serif", label: "Roboto" },
+    { value: "Arial, sans-serif", label: "Arial" },
+    { value: "Georgia, serif", label: "Georgia" },
+    { value: "Times New Roman, serif", label: "Times New Roman" },
+    { value: "Courier New, monospace", label: "Courier New" },
+  ];
 
   return (
     <Paper
@@ -57,15 +85,48 @@ const PropertiesBar = ({ element, onEdit }) => {
               }}
             />
             <TextField
+              select
+              label="Font Family"
+              variant="outlined"
+              value={element.fontFamily || "Roboto, sans-serif"}
+              onChange={(e) => handleChange("fontFamily", e.target.value)}
+              sx={{
+                "& .MuiSelect-select": { color: "#fff" },
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": { borderColor: "#555" },
+                  "&:hover fieldset": { borderColor: "#777" },
+                  "&.Mui-focused fieldset": { borderColor: "#90caf9" },
+                },
+                "& .MuiInputLabel-root": {
+                  color: "#aaa",
+                  "&.Mui-focused": { color: "#90caf9" },
+                },
+              }}
+            >
+              {fontFamilyOptions.map((option) => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.label}
+                </MenuItem>
+              ))}
+            </TextField>
+            <TextField
               label="Font Size"
               variant="outlined"
-              value={element.fontSize || "2rem"}
-              onChange={(e) => handleChange("fontSize", e.target.value)}
+              type="number"
+              value={getFontSizeValue(element.fontSize) || "32"}
+              onChange={(e) => {
+                const value = e.target.value;
+                const formattedValue = value ? `${value}px` : "32px";
+                handleChange("fontSize", formattedValue);
+              }}
               onBlur={(e) => {
-                handleChange("fontSize", e.target.value);
+                const value = e.target.value;
+                const formattedValue = value ? `${value}px` : "32px";
+                handleChange("fontSize", formattedValue);
               }}
               InputProps={{
-                endAdornment: <InputAdornment position="end" sx={{ color: "#aaa" }}>px/rem</InputAdornment>,
+                endAdornment: <InputAdornment position="end" sx={{ color: "#aaa" }}>px</InputAdornment>,
+                inputProps: { min: 8, max: 200 }
               }}
               sx={{
                 input: { color: "#fff" },
@@ -83,10 +144,14 @@ const PropertiesBar = ({ element, onEdit }) => {
             <TextField
               label="Font Weight"
               variant="outlined"
+              type="number"
               value={element.fontWeight || "700"}
               onChange={(e) => handleChange("fontWeight", e.target.value)}
               onBlur={(e) => {
                 handleChange("fontWeight", e.target.value);
+              }}
+              InputProps={{
+                inputProps: { min: 100, max: 900, step: 100 }
               }}
               sx={{
                 input: { color: "#fff" },
@@ -129,15 +194,73 @@ const PropertiesBar = ({ element, onEdit }) => {
               }}
             />
             <TextField
+              select
+              label="Font Family"
+              variant="outlined"
+              value={element.fontFamily || "Roboto, sans-serif"}
+              onChange={(e) => handleChange("fontFamily", e.target.value)}
+              sx={{
+                "& .MuiSelect-select": { color: "#fff" },
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": { borderColor: "#555" },
+                  "&:hover fieldset": { borderColor: "#777" },
+                  "&.Mui-focused fieldset": { borderColor: "#90caf9" },
+                },
+                "& .MuiInputLabel-root": {
+                  color: "#aaa",
+                  "&.Mui-focused": { color: "#90caf9" },
+                },
+              }}
+            >
+              {fontFamilyOptions.map((option) => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.label}
+                </MenuItem>
+              ))}
+            </TextField>
+            <TextField
               label="Font Size"
               variant="outlined"
-              value={element.fontSize || "1rem"}
-              onChange={(e) => handleChange("fontSize", e.target.value)}
+              type="number"
+              value={getFontSizeValue(element.fontSize) || "16"}
+              onChange={(e) => {
+                const value = e.target.value;
+                const formattedValue = value ? `${value}px` : "16px";
+                handleChange("fontSize", formattedValue);
+              }}
               onBlur={(e) => {
-                handleChange("fontSize", e.target.value);
+                const value = e.target.value;
+                const formattedValue = value ? `${value}px` : "16px";
+                handleChange("fontSize", formattedValue);
               }}
               InputProps={{
-                endAdornment: <InputAdornment position="end" sx={{ color: "#aaa" }}>px/rem</InputAdornment>,
+                endAdornment: <InputAdornment position="end" sx={{ color: "#aaa" }}>px</InputAdornment>,
+                inputProps: { min: 8, max: 200 }
+              }}
+              sx={{
+                input: { color: "#fff" },
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": { borderColor: "#555" },
+                  "&:hover fieldset": { borderColor: "#777" },
+                  "&.Mui-focused fieldset": { borderColor: "#90caf9" },
+                },
+                "& .MuiInputLabel-root": {
+                  color: "#aaa",
+                  "&.Mui-focused": { color: "#90caf9" },
+                },
+              }}
+            />
+            <TextField
+              label="Font Weight"
+              variant="outlined"
+              type="number"
+              value={element.fontWeight || "400"}
+              onChange={(e) => handleChange("fontWeight", e.target.value)}
+              onBlur={(e) => {
+                handleChange("fontWeight", e.target.value);
+              }}
+              InputProps={{
+                inputProps: { min: 100, max: 900, step: 100 }
               }}
               sx={{
                 input: { color: "#fff" },
@@ -180,13 +303,21 @@ const PropertiesBar = ({ element, onEdit }) => {
             <TextField
               label="Width"
               variant="outlined"
-              value={element.width || "120px"}
-              onChange={(e) => handleChange("width", e.target.value)}
+              type="number"
+              value={getFontSizeValue(element.width) || "120"}
+              onChange={(e) => {
+                const value = e.target.value;
+                const formattedValue = value ? `${value}px` : "120px";
+                handleChange("width", formattedValue);
+              }}
               onBlur={(e) => {
-                handleChange("width", e.target.value);
+                const value = e.target.value;
+                const formattedValue = value ? `${value}px` : "120px";
+                handleChange("width", formattedValue);
               }}
               InputProps={{
                 endAdornment: <InputAdornment position="end" sx={{ color: "#aaa" }}>px</InputAdornment>,
+                inputProps: { min: 50, max: 1000 }
               }}
               sx={{
                 input: { color: "#fff" },
@@ -204,13 +335,21 @@ const PropertiesBar = ({ element, onEdit }) => {
             <TextField
               label="Height"
               variant="outlined"
-              value={element.height || "120px"}
-              onChange={(e) => handleChange("height", e.target.value)}
+              type="number"
+              value={getFontSizeValue(element.height) || "120"}
+              onChange={(e) => {
+                const value = e.target.value;
+                const formattedValue = value ? `${value}px` : "120px";
+                handleChange("height", formattedValue);
+              }}
               onBlur={(e) => {
-                handleChange("height", e.target.value);
+                const value = e.target.value;
+                const formattedValue = value ? `${value}px` : "120px";
+                handleChange("height", formattedValue);
               }}
               InputProps={{
                 endAdornment: <InputAdornment position="end" sx={{ color: "#aaa" }}>px</InputAdornment>,
+                inputProps: { min: 50, max: 1000 }
               }}
               sx={{
                 input: { color: "#fff" },
