@@ -7,6 +7,7 @@ const cors = require("cors");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const rateLimit = require('express-rate-limit');
+const { v4: uuidv4 } = require('uuid');
 require("dotenv").config();
 const PORT = process.env.PORT;
 
@@ -40,36 +41,88 @@ const userSchema = new mongoose.Schema({
 });
 const User = mongoose.model("cms_users",userSchema);
 
+// Page draft schema
+const pageDraftSchema = new mongoose.Schema({
+  id: {
+    type: String,
+    required: true,
+    unique: true
+  },
+  title: {
+    type: String,
+    required: true
+  },
+  userId: {
+    type: String,
+    required: true
+  },
+  elements: [{
+    type: {
+      type: String,
+      required: true
+    },
+    text: String,
+    src: String,
+    alt: String,
+    width: String,
+    height: String,
+    fontSize: String,
+    fontWeight: String,
+    fontFamily: String,
+    fontColor: String,
+    isBold: Boolean,
+    isItalic: Boolean,
+    isUnderline: Boolean,
+    isSubscript: Boolean,
+    isSuperscript: Boolean
+  }],
+  createdAt: {
+    type: Date,
+    default: Date.now
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now
+  },
+  status: {
+    type: String,
+    enum: ['draft', 'published'],
+    default: 'draft'
+  }
+});
+
+const PageDraft = mongoose.model("page_drafts", pageDraftSchema);
+
 // JWT Middleware for authentication
 const authenticateToken = async (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  
+  if (!token) {
+    return res.status(401).send({ message: 'Access token required' });
+  }
+
   try {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
-
-    if (!token) {
-      return res.status(401).send({ message: "Access token required" });
-    }
-
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     
-    // Find user by ID from token
+    // Fetch full user data from database
     const user = await User.findOne({ id: decoded.id });
     if (!user) {
-      return res.status(401).send({ message: "User not found" });
+      return res.status(401).send({ message: 'User not found' });
     }
 
-    // Attach user to request object (excluding password)
+    // Add user data to request object
     req.user = {
       id: user.id,
       fullname: user.fullname,
       email: user.email,
       role: user.role
     };
-    
+
     next();
   } catch (error) {
-    console.error('JWT verification error:', error);
-    return res.status(403).send({ message: "Invalid or expired token" });
+    console.error('Token verification error:', error);
+    return res.status(403).send({ message: 'Invalid token' });
   }
 };
 
@@ -215,6 +268,208 @@ app.post("/api/login", async(req,res) => {
 
 app.get("/health-check", (req, res) => {
   res.status(200).send("All right!");
+});
+
+// Save page as draft
+app.post("/api/pages/draft", authenticateToken, async (req, res) => {
+  try {
+    const { title, elements, overwrite = false } = req.body;
+    
+    if (!title || !elements) {
+      return res.status(400).send({ message: "Title and elements are required" });
+    }
+
+    // Check if title already exists (unless overwrite is true)
+    if (!overwrite) {
+      const existingDraft = await PageDraft.findOne({ 
+        userId: req.user.id, 
+        title: title.trim(),
+        status: 'draft'
+      });
+
+      if (existingDraft) {
+        return res.status(409).send({ 
+          message: "Draft with this title already exists",
+          existingDraft: existingDraft,
+          requiresOverwrite: true
+        });
+      }
+    }
+
+    // If overwriting, delete the existing draft first
+    if (overwrite) {
+      await PageDraft.findOneAndDelete({ 
+        userId: req.user.id, 
+        title: title.trim(),
+        status: 'draft'
+      });
+    }
+
+    const pageDraft = new PageDraft({
+      id: uuidv4(),
+      title: title.trim(),
+      userId: req.user.id,
+      elements,
+      updatedAt: new Date()
+    });
+
+    await pageDraft.save();
+    
+    res.status(201).send({
+      message: "Page draft saved successfully",
+      draft: pageDraft
+    });
+
+  } catch (error) {
+    console.error('Draft save error:', error);
+    res.status(500).send({ message: "Failed to save page draft" });
+  }
+});
+
+// Get user's page drafts
+app.get("/api/pages/drafts", authenticateToken, async (req, res) => {
+  try {
+    const drafts = await PageDraft.find({ 
+      userId: req.user.id,
+      status: 'draft'
+    }).sort({ updatedAt: -1 });
+
+    res.status(200).send({
+      drafts,
+      message: "Page drafts retrieved successfully"
+    });
+
+  } catch (error) {
+    console.error('Drafts fetch error:', error);
+    res.status(500).send({ message: "Failed to fetch page drafts" });
+  }
+});
+
+// Get specific page draft
+app.get("/api/pages/draft/:id", authenticateToken, async (req, res) => {
+  try {
+    const draft = await PageDraft.findOne({ 
+      id: req.params.id,
+      userId: req.user.id
+    });
+
+    if (!draft) {
+      return res.status(404).send({ message: "Page draft not found" });
+    }
+
+    res.status(200).send({
+      draft,
+      message: "Page draft retrieved successfully"
+    });
+
+  } catch (error) {
+    console.error('Draft fetch error:', error);
+    res.status(500).send({ message: "Failed to fetch page draft" });
+  }
+});
+
+// Update page draft
+app.put("/api/pages/draft/:id", authenticateToken, async (req, res) => {
+  try {
+    const { title, elements } = req.body;
+    
+    // Check if new title conflicts with another draft
+    if (title) {
+      const existingDraft = await PageDraft.findOne({ 
+        userId: req.user.id, 
+        title: title.trim(),
+        status: 'draft',
+        id: { $ne: req.params.id }
+      });
+
+      if (existingDraft) {
+        return res.status(409).send({ 
+          message: "Another draft with this title already exists",
+          existingDraft: existingDraft,
+          requiresOverwrite: true
+        });
+      }
+    }
+    
+    const updatedDraft = await PageDraft.findOneAndUpdate(
+      { id: req.params.id, userId: req.user.id },
+      { 
+        title: title.trim(), 
+        elements, 
+        updatedAt: new Date() 
+      },
+      { new: true }
+    );
+
+    if (!updatedDraft) {
+      return res.status(404).send({ message: "Page draft not found" });
+    }
+
+    res.status(200).send({
+      draft: updatedDraft,
+      message: "Page draft updated successfully"
+    });
+
+  } catch (error) {
+    console.error('Draft update error:', error);
+    res.status(500).send({ message: "Failed to update page draft" });
+  }
+});
+
+// Delete page draft
+app.delete("/api/pages/draft/:id", authenticateToken, async (req, res) => {
+  try {
+    const deletedDraft = await PageDraft.findOneAndDelete({ 
+      id: req.params.id,
+      userId: req.user.id
+    });
+
+    if (!deletedDraft) {
+      return res.status(404).send({ message: "Page draft not found" });
+    }
+
+    res.status(200).send({
+      message: "Page draft deleted successfully"
+    });
+
+  } catch (error) {
+    console.error('Draft delete error:', error);
+    res.status(500).send({ message: "Failed to delete page draft" });
+  }
+});
+
+// Check if draft title exists
+app.post("/api/pages/draft/check-title", authenticateToken, async (req, res) => {
+  try {
+    const { title, excludeId } = req.body;
+    
+    if (!title) {
+      return res.status(400).send({ message: "Title is required" });
+    }
+
+    const query = { 
+      userId: req.user.id, 
+      title: title.trim(),
+      status: 'draft'
+    };
+
+    // If excludeId is provided, exclude that draft from the search (for updates)
+    if (excludeId) {
+      query.id = { $ne: excludeId };
+    }
+
+    const existingDraft = await PageDraft.findOne(query);
+
+    res.status(200).send({
+      exists: !!existingDraft,
+      draft: existingDraft || null,
+      message: existingDraft ? "Draft with this title already exists" : "Title is available"
+    });
+
+  } catch (error) {
+    console.error('Title check error:', error);
+    res.status(500).send({ message: "Failed to check title availability" });
+  }
 });
 
 app.listen(PORT, () => {

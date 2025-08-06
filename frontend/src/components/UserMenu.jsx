@@ -1,193 +1,237 @@
-import React from "react";
-import Box from "@mui/material/Box";
-import Avatar from "@mui/material/Avatar";
-import Popover from "@mui/material/Popover";
+import * as React from "react";
 import Button from "@mui/material/Button";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import Avatar from "@mui/material/Avatar";
 import Typography from "@mui/material/Typography";
-import Chip from "@mui/material/Chip";
-import CircularProgress from "@mui/material/CircularProgress";
-import { useNavigate } from "react-router-dom";
+import Divider from "@mui/material/Divider";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import PersonIcon from "@mui/icons-material/Person";
+import SettingsIcon from "@mui/icons-material/Settings";
+import LogoutIcon from "@mui/icons-material/Logout";
+import Box from "@mui/material/Box";
 import { useUser } from "../context/UserContext";
 
 const UserMenu = ({ handleLogout }) => {
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const navigate = useNavigate();
-  const { user, loading, clearUser } = useUser();
+  const open = Boolean(anchorEl);
+  const { user, loading } = useUser();
 
-  const handleIconClick = (event) => {
+  const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
-  };
-
-  const handleLogoutClick = () => {
-    clearUser(); // Clear user context
-    handleLogout(); // Call parent logout handler
-    navigate("/login");
   };
 
   const handleClose = () => {
     setAnchorEl(null);
   };
 
-  // Get user initials for avatar
-  const getUserInitials = (name) => {
-    if (!name) return "U";
-    const names = name.split(" ");
-    if (names.length >= 2) {
-      return `${names[0][0]}${names[1][0]}`.toUpperCase();
-    }
-    return name[0].toUpperCase();
+  const handleLogoutClick = () => {
+    handleLogout();
+    handleClose();
   };
 
-  // Get role color
-  const getRoleColor = (role) => {
-    switch (role?.toLowerCase()) {
-      case 'admin': return '#f44336';
-      case 'editor': return '#ff9800';
-      case 'guest': return '#4caf50';
-      default: return '#9e9e9e';
-    }
+  // Generate initials from user's full name
+  const getInitials = (fullname) => {
+    if (!fullname) return "U";
+    return fullname
+      .split(" ")
+      .map((name) => name.charAt(0))
+      .join("")
+      .toUpperCase()
+      .slice(0, 2); // Take only first 2 initials
   };
 
-  const open = Boolean(anchorEl);
+  // Generate a consistent color based on the user's name
+  const getAvatarColor = (fullname) => {
+    if (!fullname) return "#1976d2";
+    let hash = 0;
+    for (let i = 0; i < fullname.length; i++) {
+      hash = fullname.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const colors = [
+      "#1976d2",
+      "#388e3c",
+      "#f57c00",
+      "#7b1fa2",
+      "#c2185b",
+      "#00796b",
+    ];
+    return colors[Math.abs(hash) % colors.length];
+  };
 
-  // Show loading state
   if (loading) {
     return (
-      <Box
-        sx={{
-          width: "100%",
-          display: "flex",
-          justifyContent: "center",
-          mt: -15,
-          marginLeft: "auto",
-          marginBottom: "25px",
-          "@media (max-width:700px)": { display: "none" },
-        }}
-      >
-        <CircularProgress size={40} sx={{ color: "#90caf9" }} />
-      </Box>
-    );
-  }
-
-  // Show default if no user data
-  if (!user) {
-    return (
-      <Box
-        sx={{
-          width: "100%",
-          display: "flex",
-          justifyContent: "center",
-          mt: -15,
-          marginLeft: "auto",
-          marginBottom: "25px",
-          "@media (max-width:700px)": { display: "none" },
-        }}
-      >
-        <Avatar
-          sx={{ bgcolor: "slategray", cursor: "pointer" }}
-          onClick={handleIconClick}
+      <Box>
+        <Button
+          sx={{
+            bgcolor: "#232323",
+            color: "#fff",
+            borderRadius: "8px",
+            px: 2,
+            py: 1,
+            "&:hover": { bgcolor: "#333" },
+          }}
+          disabled
         >
-          U
-        </Avatar>
-        <Popover
-          open={open}
-          anchorEl={anchorEl}
-          onClose={handleClose}
-          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-        >
-          <Box sx={{ p: 2, minWidth: 200 }}>
-            <Typography variant="body2" sx={{ color: "gray", mb: 2 }}>
-              User data not available
-            </Typography>
-            <Button
-              variant="contained"
-              color="error"
-              sx={{ mt: 2, width: "100%" }}
-              onClick={handleLogoutClick}
-            >
-              Log Out
-            </Button>
-          </Box>
-        </Popover>
+          Loading...
+        </Button>
       </Box>
     );
   }
 
   return (
-    <Box
-      sx={{
-        width: "100%",
-        display: "flex",
-        justifyContent: "center",
-        mt: -15,
-        marginLeft: "auto",
-        marginBottom: "25px",
-        "@media (max-width:700px)": { display: "none" },
-      }}
-    >
-      <Avatar
-        sx={{ 
-          bgcolor: getRoleColor(user.role), 
-          cursor: "pointer",
-          border: "2px solid #333"
+    <Box>
+      <Button
+        onClick={handleClick}
+        endIcon={<ArrowDropDownIcon />}
+        sx={{
+          bgcolor: "#232323",
+          color: "#fff",
+          borderRadius: "8px",
+          px: 2,
+          py: 1,
+          "&:hover": { bgcolor: "#333" },
+          textTransform: "none",
+          display: "flex",
+          alignItems: "center",
+          gap: 1,
         }}
-        onClick={handleIconClick}
       >
-        {getUserInitials(user.fullname)}
-      </Avatar>
-      <Popover
-        open={open}
+        <Avatar
+          sx={{
+            width: 32,
+            height: 32,
+            bgcolor: getAvatarColor(user?.fullname || "User"),
+            fontSize: "14px",
+            fontWeight: "bold",
+          }}
+        >
+          {getInitials(user?.fullname || "User")}
+        </Avatar>
+        <Box sx={{ display: { xs: "none", sm: "block" } }}>
+          <Typography variant="body2" sx={{ fontWeight: 500 }}>
+            {user?.fullname || "User"}
+          </Typography>
+        </Box>
+      </Button>
+
+      <Menu
         anchorEl={anchorEl}
+        open={open}
         onClose={handleClose}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-        PaperProps={{
-          sx: {
+        sx={{
+          "& .MuiPaper-root": {
             bgcolor: "#232323",
             color: "#fff",
-            border: "1px solid #444"
-          }
+            border: "1px solid #333",
+            minWidth: 250,
+            mt: 1,
+          },
         }}
+        transformOrigin={{ horizontal: "right", vertical: "top" }}
+        anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
-        <Box sx={{ p: 3, minWidth: 250 }}>
-          <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
-            {user.fullname}
-          </Typography>
-          <Typography variant="body2" sx={{ color: "#aaa", mb: 2 }}>
-            {user.email}
-          </Typography>
-          
-          <Box sx={{ mb: 2 }}>
-            <Chip
-              label={user.role?.toUpperCase() || 'GUEST'}
-              size="small"
+        {/* User Info Header */}
+        <Box sx={{ p: 2, borderBottom: "1px solid #333" }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 1 }}>
+            <Avatar
               sx={{
-                bgcolor: getRoleColor(user.role),
-                color: "#fff",
-                fontWeight: 600,
-                fontSize: "0.75rem"
+                width: 48,
+                height: 48,
+                bgcolor: getAvatarColor(user?.fullname || "User"),
+                fontSize: "18px",
+                fontWeight: "bold",
               }}
-            />
+            >
+              {getInitials(user?.fullname || "User")}
+            </Avatar>
+            <Box>
+              <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                {user?.fullname || "User"}
+              </Typography>
+              <Typography
+                variant="body2"
+                sx={{ color: "#aaa", fontSize: "12px" }}
+              >
+                {user?.email || "user@example.com"}
+              </Typography>
+              <Typography
+                variant="caption"
+                sx={{
+                  color: "#90caf9",
+                  fontSize: "11px",
+                  textTransform: "capitalize",
+                }}
+              >
+                {user?.role || "user"} Account
+              </Typography>
+            </Box>
           </Box>
-
-          <Typography variant="caption" sx={{ color: "#666", mb: 2, display: "block" }}>
-            User ID: {user.id}
-          </Typography>
-          
-          <Button
-            variant="contained"
-            color="error"
-            sx={{ 
-              mt: 2, 
-              width: "100%",
-              bgcolor: "#f44336",
-              "&:hover": { bgcolor: "#d32f2f" }
-            }}
-            onClick={handleLogoutClick}
-          >
-            Log Out
-          </Button>
         </Box>
-      </Popover>
+
+        <Divider sx={{ bgcolor: "#333" }} />
+
+        {/* Menu Items */}
+        <MenuItem
+          onClick={handleClose}
+          sx={{
+            "&:hover": { bgcolor: "#333" },
+            py: 1.5,
+            display: "flex",
+            alignItems: "center",
+            gap: 2,
+          }}
+        >
+          <PersonIcon sx={{ fontSize: 20, color: "#90caf9" }} />
+          <Box>
+            <Typography variant="body2">Profile</Typography>
+            <Typography variant="caption" sx={{ color: "#aaa" }}>
+              Manage your account
+            </Typography>
+          </Box>
+        </MenuItem>
+
+        <MenuItem
+          onClick={handleClose}
+          sx={{
+            "&:hover": { bgcolor: "#333" },
+            py: 1.5,
+            display: "flex",
+            alignItems: "center",
+            gap: 2,
+          }}
+        >
+          <SettingsIcon sx={{ fontSize: 20, color: "#90caf9" }} />
+          <Box>
+            <Typography variant="body2">Settings</Typography>
+            <Typography variant="caption" sx={{ color: "#aaa" }}>
+              App preferences
+            </Typography>
+          </Box>
+        </MenuItem>
+
+        <Divider sx={{ bgcolor: "#333", my: 1 }} />
+
+        <MenuItem
+          onClick={handleLogoutClick}
+          sx={{
+            "&:hover": { bgcolor: "#333" },
+            py: 1.5,
+            display: "flex",
+            alignItems: "center",
+            gap: 2,
+            color: "#ff5722",
+          }}
+        >
+          <LogoutIcon sx={{ fontSize: 20 }} />
+          <Box>
+            <Typography variant="body2">Logout</Typography>
+            <Typography variant="caption" sx={{ color: "#aaa" }}>
+              Sign out of your account
+            </Typography>
+          </Box>
+        </MenuItem>
+      </Menu>
     </Box>
   );
 };

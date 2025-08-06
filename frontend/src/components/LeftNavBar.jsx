@@ -29,10 +29,44 @@ import Typography from "@mui/material/Typography";
 import List from "@mui/material/List";
 import ListItemButton from "@mui/material/ListItemButton";
 import Button from "@mui/material/Button";
+import { useNavigate, useLocation } from "react-router-dom";
 
-const navItems = ["Dashboard", "Product Pages", "Media Library", "Settings"];
+const navItems = [
+  { name: "Dashboard", path: "/newpage" },
+  { name: "Page Drafts", path: "/drafts" },
+  { name: "Published Pages", path: "/published" },
+  { name: "Media Library", path: "/media" },
+  ];
 
-const LeftNavBar = () => {
+const LeftNavBar = ({ showUnsavedWarning }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleNavigation = (path) => {
+    if (showUnsavedWarning) {
+      if (showUnsavedWarning(() => navigate(path))) {
+        navigate(path);
+      }
+    } else {
+      navigate(path);
+    }
+  };
+
+  const handleNewPage = () => {
+    if (location.pathname === "/newpage") {
+      // If already on new page, just refresh/clear
+      if (showUnsavedWarning) {
+        if (showUnsavedWarning(() => window.location.reload())) {
+          window.location.reload();
+        }
+      } else {
+        window.location.reload();
+      }
+    } else {
+      handleNavigation("/newpage");
+    }
+  };
+
   return (
     <Paper
       elevation={8}
@@ -61,26 +95,29 @@ const LeftNavBar = () => {
         <List sx={{ width: "100%" }}>
           {navItems.map((item) => (
             <ListItemButton
-              key={item}
+              key={item.name}
+              onClick={() => handleNavigation(item.path)}
               sx={{
-                color: "#fff",
+                color: location.pathname === item.path ? "#90caf9" : "#fff",
                 fontWeight: 500,
                 fontSize: "1.5rem",
                 px: 2,
                 py: 1.5,
                 borderRadius: "10px",
                 mb: 1,
+                bgcolor: location.pathname === item.path ? "#181818" : "transparent",
                 "&:hover": { background: "#181818", color: "#90caf9" },
                 transition: "background 0.2s, color 0.2s",
               }}
             >
-              {item}
+              {item.name}
             </ListItemButton>
           ))}
         </List>
       </nav>
       <Button
         variant="contained"
+        onClick={handleNewPage}
         sx={{
           mt: "10%",
           bgcolor: "#1976d2",

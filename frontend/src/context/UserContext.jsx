@@ -56,12 +56,19 @@ export const UserProvider = ({ children }) => {
   // Update user data
   const updateUser = (userData) => {
     setUser(userData);
+    setLoading(false);
   };
 
   // Clear user data on logout
   const clearUser = () => {
     setUser(null);
-    localStorage.removeItem('token');
+    setLoading(false);
+  };
+
+  // Refresh user data
+  const refreshUser = () => {
+    setLoading(true);
+    fetchUserData();
   };
 
   const value = {
@@ -69,7 +76,8 @@ export const UserProvider = ({ children }) => {
     loading,
     fetchUserData,
     updateUser,
-    clearUser
+    clearUser,
+    refreshUser
   };
 
   return (

@@ -52,7 +52,7 @@ const Login = ({handleLogin}) => {
             }
             
             handleLogin();
-            navigate("/NewPage");
+            navigate("/newpage");
 
         } catch(e) {
             console.error('Login error:', e);

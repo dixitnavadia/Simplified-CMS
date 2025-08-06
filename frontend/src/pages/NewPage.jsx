@@ -1,30 +1,26 @@
 import * as React from "react";
 import LeftNavBar from "../components/LeftNavBar";
 import PropertiesBar from "../components/PropertiesBar";
-import UserMenu from "../components/UserMenu";
 import ElementRenderer from "../components/ElementRenderer";
 import AddElementModal from "../components/AddElementModal";
 import ActionsBar from "../components/ActionsBar";
 import PageMetaData from "../components/PageMetaData";
+import useUnsavedChanges from "../hooks/useUnsavedChanges";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { Snackbar, Alert } from "@mui/material";
+import axios from "axios";
 
 const NewPage = ({handleLogout}) => {
   const [open, setOpen] = React.useState(false);
   const [elements, setElements] = React.useState([]);
   const [selectedElement, setSelectedElement] = React.useState(null);
   const [pageMetaData, setPageMetaData] = React.useState([]);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = React.useState(false);
   const [snackbar, setSnackbar] = React.useState({
     open: false,
     message: "",
     severity: "success"
-  });
-
-  // Initialize PageMetaData hook
-  const metaDataManager = PageMetaData({ 
-    elements, 
-    onMetaDataChange: setPageMetaData 
   });
 
   // Load elements from localStorage on initial render
@@ -32,8 +28,10 @@ const NewPage = ({handleLogout}) => {
     const savedElements = localStorage.getItem("page-elements");
     if (savedElements) {
       try {
-        setElements(JSON.parse(savedElements));
-        console.log('🔄 Loaded elements from localStorage:', JSON.parse(savedElements));
+        const parsedElements = JSON.parse(savedElements);
+        setElements(parsedElements);
+        setHasUnsavedChanges(parsedElements.length > 0);
+        console.log('🔄 Loaded elements from localStorage:', parsedElements);
       } catch (e) {
         console.error("❌ Failed to parse saved elements", e);
       }
@@ -47,6 +45,7 @@ const NewPage = ({handleLogout}) => {
     console.log(`➕ Adding new element of type: ${type}`);
     const newElements = [...elements, { type }];
     setElements(newElements);
+    setHasUnsavedChanges(true);
     saveElementsToJson(newElements);
     handleClose();
   };
@@ -55,6 +54,7 @@ const NewPage = ({handleLogout}) => {
     console.log(`🗑️ Deleting element with id: ${id}`);
     const newElements = elements.filter((_, i) => i !== id);
     setElements(newElements);
+    setHasUnsavedChanges(newElements.length > 0);
     saveElementsToJson(newElements);
     
     if (selectedElement && selectedElement.id === id) {
@@ -66,22 +66,20 @@ const NewPage = ({handleLogout}) => {
   const handleEditElement = (id, updatedEl) => {
     console.log("✏️ Editing element:", id, updatedEl);
     
-    // Update the elements array
     const newElements = elements.map((el, idx) => 
       idx === id ? { ...el, ...updatedEl } : el
     );
     
     setElements(newElements);
+    setHasUnsavedChanges(true);
     saveElementsToJson(newElements);
     
-    // If this is the currently selected element, update that too
     if (selectedElement && selectedElement.id === id) {
       setSelectedElement({ ...selectedElement, ...updatedEl });
       console.log('🔄 Updated selected element:', { ...selectedElement, ...updatedEl });
     }
   };
 
-  // Save elements to JSON
   const saveElementsToJson = (elementsToSave) => {
     try {
       localStorage.setItem("page-elements", JSON.stringify(elementsToSave));
@@ -91,7 +89,6 @@ const NewPage = ({handleLogout}) => {
     }
   };
 
-  // Manual save function for the Save button
   const handleSave = () => {
     saveElementsToJson(elements);
     console.log('💾 Manual save triggered');
@@ -106,14 +103,49 @@ const NewPage = ({handleLogout}) => {
     setSnackbar({ ...snackbar, open: false });
   };
 
-  // Debug logging for state changes
+  const handleSaveDraft = async (title) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.post('http://localhost:3000/api/pages/draft', {
+        title,
+        elements
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      setHasUnsavedChanges(false);
+      localStorage.removeItem("page-elements");
+      
+      setSnackbar({
+        open: true,
+        message: "Page saved as draft successfully!",
+        severity: "success"
+      });
+      
+      console.log('📄 Draft saved:', response.data.draft);
+    } catch (error) {
+      console.error('Error saving draft:', error);
+      setSnackbar({
+        open: true,
+        message: error.response?.data?.message || "Failed to save draft",
+        severity: "error"
+      });
+    }
+  };
+
+  const { showUnsavedWarning } = useUnsavedChanges(hasUnsavedChanges, elements, handleSaveDraft);
+
   React.useEffect(() => {
     console.group('🔄 State Update');
     console.log("Elements:", elements);
     console.log("Selected Element:", selectedElement);
+    console.log("Has Unsaved Changes:", hasUnsavedChanges);
     console.log("Page Metadata:", pageMetaData);
     console.groupEnd();
-  }, [elements, selectedElement, pageMetaData]);
+  }, [elements, selectedElement, pageMetaData, hasUnsavedChanges]);
 
   return (
     <Box
@@ -126,11 +158,16 @@ const NewPage = ({handleLogout}) => {
       }}
       onClick={() => setSelectedElement(null)}
     >
-      <LeftNavBar />
+      <LeftNavBar showUnsavedWarning={showUnsavedWarning} />
       <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
         <Box sx={{ px: 4, py: 3, borderBottom: "1px solid #333" }}>
           <Typography variant="h4" component="h1">
             New Product Page
+            {hasUnsavedChanges && (
+              <Typography component="span" sx={{ color: "#ff9800", ml: 1, fontSize: "0.8em" }}>
+                (Unsaved changes)
+              </Typography>
+            )}
           </Typography>
         </Box>
         <Box
@@ -159,6 +196,9 @@ const NewPage = ({handleLogout}) => {
             <ActionsBar 
               onAdd={handleOpen} 
               onSave={handleSave}
+              onSaveDraft={handleSaveDraft}
+              elements={elements}
+              isDraftMode={false}
             />
             <AddElementModal
               open={open}
@@ -166,7 +206,7 @@ const NewPage = ({handleLogout}) => {
               addElement={addElement}
             />
           </Box>
-          {/* Right Panel */}
+          {/* Right Panel - Removed UserMenu from here */}
           <Box
             sx={{
               width: { xs: "100%", md: 320 },
@@ -180,7 +220,6 @@ const NewPage = ({handleLogout}) => {
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <UserMenu handleLogout={handleLogout} />
             {selectedElement && (
               <PropertiesBar
                 element={selectedElement}
